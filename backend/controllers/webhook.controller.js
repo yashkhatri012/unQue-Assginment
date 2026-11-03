@@ -1,5 +1,6 @@
 
 
+import { extractLeadData } from "../services/meta.service.js";
 
 export const VerifyWebhook = (req, res) => {
   try {
@@ -24,3 +25,27 @@ export const VerifyWebhook = (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+export const receiveLeadWebhook = async (req, res) => {
+  try {
+    const payload = req.body;
+    
+    const leadgenId = payload?.entry?.[0]?.changes?.[0]?.value?.leadgen_id;
+    
+
+    const data = await extractLeadData(leadgenId)
+    if (!data) {
+      res.status(404).send("Lead data not found");
+      return;
+    }
+    res.json(data);
+
+  } catch (error) {
+    console.error("Error receiving lead webhook:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+
+
