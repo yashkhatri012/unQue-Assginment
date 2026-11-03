@@ -1,13 +1,17 @@
 import express from "express";
 import dotenv from "dotenv";
 import webhookRoutes from "./routes/webhook.routes.js";
-
+import connectDB from "./config/db.js";   
 
 dotenv.config();
 
 
 
 const app = express();
+await connectDB();
+
+
+
 app.use(express.json());
 app.use("/api", webhookRoutes);
 
