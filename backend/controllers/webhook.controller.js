@@ -1,6 +1,7 @@
 
 
 import { extractLeadData } from "../services/meta.service.js";
+import { databaseEntry } from "../services/lead.service.js";
 
 export const VerifyWebhook = (req, res) => {
   try {
@@ -9,7 +10,7 @@ export const VerifyWebhook = (req, res) => {
     const hubChallenge = req.query["hub.challenge"];
     const hubVerifyToken = req.query["hub.verify_token"];
 
-    
+    console.log("Webhook verification request received")
 
     const verifyToken = process.env.WEBHOOK_VERIFY_TOKEN;
 
@@ -29,17 +30,34 @@ export const VerifyWebhook = (req, res) => {
 
 export const receiveLeadWebhook = async (req, res) => {
   try {
+    console.log("========== WEBHOOK HIT ==========");
+console.log("Request body:", JSON.stringify(req.body, null, 2));
     const payload = req.body;
     
     const leadgenId = payload?.entry?.[0]?.changes?.[0]?.value?.leadgen_id;
     
-
+    if(!leadgenId) {
+      res.status(400).send("Leadgen ID not found in the payload");
+      return;
+    }
+    console.log('extraction started-------------')
     const data = await extractLeadData(leadgenId)
+
+    console.log('extraction ended-------------')
+    
+
     if (!data) {
       res.status(404).send("Lead data not found");
       return;
     }
-    res.json(data);
+    
+    const newLead =  await databaseEntry(data);
+
+    res.status(200).json({
+      success: true,
+      message: "Data fetched successfully",
+      data: newLead
+  });
 
   } catch (error) {
     console.error("Error receiving lead webhook:", error);

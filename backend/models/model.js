@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const schema = new mongoose.Schema({
+
+const leadSchema = new mongoose.Schema({
   leadgenId: {
     type: String,
     required: true,
@@ -23,6 +24,6 @@ const schema = new mongoose.Schema({
   },
 });
 
-const Lead = mongoose.model("Lead", schema);
+const Lead = mongoose.model("Lead", leadSchema);
 
-module.exports = Lead;
+export default Lead;
