@@ -2,6 +2,8 @@
 
 import { extractLeadData } from "../services/meta.service.js";
 import { databaseEntry } from "../services/lead.service.js";
+import { getIO } from "../config/socket.js";
+
 
 export const VerifyWebhook = (req, res) => {
   try {
@@ -52,7 +54,8 @@ console.log("Request body:", JSON.stringify(req.body, null, 2));
     }
     
     const newLead =  await databaseEntry(data);
-
+    getIO().emit("new-lead", newLead);
+    
     res.status(200).json({
       success: true,
       message: "Data fetched successfully",
